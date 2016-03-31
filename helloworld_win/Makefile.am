@@ -1,0 +1,3 @@
+bin_PROGRAMS=helloworld_win
+helloworld_win_SOURCES=helloworld_win.c
+

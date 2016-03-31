@@ -1,0 +1,3 @@
+bin_PROGRAMS=helloworld_dlg
+helloworld_dlg_SOURCES=helloworld_dlg.c
+
