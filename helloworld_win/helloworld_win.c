@@ -1,111 +1,92 @@
+// include the basic windows header file
 #include <windows.h>
+#include <windowsx.h>
+#include <tchar.h>
 
-// 2、窗口过程函数
-LRESULT CALLBACK WindowProc(  HWND hwnd,
-                              UINT uMsg,
-                              WPARAM wParam,
-                              LPARAM lParam )
+// the WindowProc function prototype
+LRESULT CALLBACK WindowProc(HWND hWnd,
+                         UINT message,
+                         WPARAM wParam,
+                         LPARAM lParam);
+
+// the entry point for any Windows program
+int WINAPI WinMain(HINSTANCE hInstance,
+                   HINSTANCE hPrevInstance,
+                   LPTSTR lpCmdLine,
+                   int nCmdShow)
 {
-    //判断消息ID
-    switch (uMsg)
+    // the handle for the window, filled by a function
+    HWND hWnd;
+    // this struct holds information for the window class
+    WNDCLASSEX wc;
+
+    // clear out the window class for use
+    ZeroMemory(&wc, sizeof(WNDCLASSEX));
+
+    // fill in the struct with the needed information
+    wc.cbSize = sizeof(WNDCLASSEX);
+    wc.style = CS_HREDRAW | CS_VREDRAW;
+    wc.lpfnWndProc = WindowProc;
+    wc.hInstance = hInstance;
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
+    wc.lpszClassName = _T("WindowClass1");
+
+    // register the window class
+    RegisterClassEx(&wc);
+
+    // create the window and use the result as the handle
+    hWnd = CreateWindowEx(0,
+                          _T("WindowClass1"),    // name of the window class
+                          _T("Our First Windowed Program"),   // title of the window
+                          WS_OVERLAPPEDWINDOW,    // window style
+                          300,    // x-position of the window
+                          300,    // y-position of the window
+                          500,    // width of the window
+                          400,    // height of the window
+                          NULL,    // we have no parent window, NULL
+                          NULL,    // we aren't using menus, NULL
+                          hInstance,    // application handle
+                          NULL);    // used with multiple windows, NULL
+
+    // display the window on the screen
+    ShowWindow(hWnd, nCmdShow);
+
+    // enter the main loop:
+
+    // this struct holds Windows event messages
+    MSG msg;
+
+    // wait for the next message in the queue, store the result in 'msg'
+    while(GetMessage(&msg, NULL, 0, 0))
     {
-        case WM_DESTROY:    // 窗口销毁消息
-            PostQuitMessage( 0 );   //  发送退出消息
-            return 0;
+        // translate keystroke messages into the right format
+        TranslateMessage(&msg);
+
+        // send the message to the WindowProc function
+        DispatchMessage(&msg);
     }
-    // 其他的消息调用缺省的消息处理程序
-    return DefWindowProc( hwnd, uMsg, wParam, lParam );
+
+    // return this part of the WM_QUIT message to Windows
+    return msg.wParam;
 }
 
-// 3、注册窗口类型
-BOOL RegisterWindow( LPCSTR lpcWndName, HINSTANCE hInstance )
+// this is the main message handler for the program
+LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    ATOM nAtom = 0;
-
-    // 构造创建窗口参数
-    WNDCLASS wndClass = { 0 };
-    
-    wndClass.style = CS_HREDRAW | CS_VREDRAW;
-    wndClass.lpfnWndProc = WindowProc;      // 指向窗口过程函数
-    wndClass.cbClsExtra = 0;
-    wndClass.cbWndExtra = 0;
-    wndClass.hInstance = hInstance;
-    wndClass.hIcon = LoadIcon( hInstance, MAKEINTRESOURCE( 100 ) );// 100为在HelloWorld.rc文件中定义的ID号
-    wndClass.hCursor = NULL;
-    wndClass.hbrBackground = (HBRUSH)COLOR_GRAYTEXT;
-    wndClass.lpszMenuName = NULL;
-    wndClass.lpszClassName = lpcWndName;    // 注册的窗口名称，并非标题，以后创建窗口根据此注册的名称创建
-    
-    nAtom = RegisterClass( &wndClass );
-    if( 0 == nAtom)
+    // sort through and find what code to run for the message given
+    switch(message)
     {
-        MessageBox( NULL, "Register Failed",
-                    "Error", MB_OK|MB_ICONERROR );
-        return FALSE;
+        // this message is read when the window is closed
+        case WM_DESTROY:
+            {
+                // close the application entirely
+                PostQuitMessage(0);
+                return 0;
+            } break;
     }
-    else
-    {
-        MessageBox( NULL, "Register Successed",
-                    "Sucessed", MB_OK );
-    }
-    return TRUE;
-}
 
-// 4、创建窗口（lpClassName 一定是已经注册过的窗口类型）
-HWND CreateMyWindow( LPCTSTR lpClassName, HINSTANCE hInstance )
-{
-    HWND hWnd = NULL;
-    // 创建窗口
-    hWnd = CreateWindow( lpClassName, "Hello World",
-                  WS_OVERLAPPEDWINDOW,
-                  0, 0, 500, 300,
-                  NULL, NULL, hInstance, NULL );
-    if( NULL == hWnd )
-    {
-        MessageBox( NULL, "Create Window Failed",
-                    "Error", MB_OK|MB_ICONERROR );
-        return NULL;
-    }
-    else
-    {
-        MessageBox( NULL, "Create Window Successed",
-                    "Sucessed", MB_OK );
-    }
-    return hWnd;
-}
-
-// 5、 显示窗口
-void DisplayMyWnd( HWND hWnd )
-{
-    ShowWindow( hWnd, SW_SHOW );
-    UpdateWindow( hWnd );
-}
-
-void doMessage()        // 消息循环处理函数
-{
-    MSG msg = { 0 };
-    // 获取消息
-    while( GetMessage( &msg, NULL, 0, 0 ) ) // 当接收到WM_QIUT消息时，GetMessage函数返回0，结束循环
-    {
-        DispatchMessage( &msg ); // 派发消息，到WindowPro函数处理
-    }
-}
-
-
-// 1、 入口函数
-int WINAPI WinMain( HINSTANCE hInstance,
-                    HINSTANCE hPrevInstance,
-                    LPSTR lpCmdLine,
-                    int nShowCmd )
-{
-    HWND hWnd = NULL;
-    LPCTSTR lpClassName = "MyWnd";  // 注册窗口的名称
-    RegisterWindow( lpClassName, hInstance );
-    hWnd = CreateMyWindow( lpClassName, hInstance );
-
-    DisplayMyWnd( hWnd );
-    doMessage();
-    
-    return 0;
+    // Handle any messages the switch statement didn't
+    return DefWindowProc (hWnd, message, wParam, lParam);
 }
 
