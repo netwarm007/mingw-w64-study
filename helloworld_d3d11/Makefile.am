@@ -1,0 +1,3 @@
+bin_PROGRAMS=helloworld_d3d11
+helloworld_d3d11_SOURCES=helloworld_d3d11.cpp
+helloworld_d3d11_LDADD=-ld3d11
