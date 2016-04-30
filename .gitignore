@@ -1,3 +1,7 @@
 *.exe
 !.gitignore
 autom4te.cache/
+*.o
+*.log
+*~
+.deps
