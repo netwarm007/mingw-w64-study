@@ -6,6 +6,9 @@
 #include <d3d11.h>
 #include <d3dx9.h>
 
+#define SCREEN_WIDTH	800
+#define	SCREEN_HEIGHT	600
+
 // global declarations
 IDXGISwapChain *g_pSwapchain;             // the pointer to the swap chain interface
 ID3D11Device *g_pDev;                     // the pointer to our Direct3D device interface
@@ -46,7 +49,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance,
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = hInstance;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
+    //wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
     wc.lpszClassName = _T("WindowClass1");
 
     // register the window class
@@ -59,8 +62,8 @@ int WINAPI _tWinMain(HINSTANCE hInstance,
                           WS_OVERLAPPEDWINDOW,    // window style
                           300,    // x-position of the window
                           300,    // y-position of the window
-                          500,    // width of the window
-                          400,    // height of the window
+                          SCREEN_WIDTH,    // width of the window
+                          SCREEN_HEIGHT,    // height of the window
                           NULL,    // we have no parent window, NULL
                           NULL,    // we aren't using menus, NULL
                           hInstance,    // application handle
@@ -128,8 +131,8 @@ HRESULT InitD3D(HWND hWnd)
 
     // fill the swap chain description struct
     scd.BufferCount = 1;                                    // one back buffer
-	scd.BufferDesc.Width = 640;
-	scd.BufferDesc.Height = 480;
+	scd.BufferDesc.Width = SCREEN_WIDTH;
+	scd.BufferDesc.Height = SCREEN_HEIGHT;
     scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;     // use 32-bit color
 	scd.BufferDesc.RefreshRate.Numerator = 60;
 	scd.BufferDesc.RefreshRate.Denominator = 1;
@@ -137,6 +140,7 @@ HRESULT InitD3D(HWND hWnd)
     scd.OutputWindow = hWnd;                                // the window to be used
     scd.SampleDesc.Count = 4;                               // how many multisamples
     scd.Windowed = TRUE;                                    // windowed/full-screen mode
+	scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;		// allow full-screen switching
 
 	const D3D_FEATURE_LEVEL FeatureLevels[] = { D3D_FEATURE_LEVEL_11_1,
 												D3D_FEATURE_LEVEL_11_0,
@@ -209,8 +213,8 @@ void SetViewPort() {
 
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
-	viewport.Width = 800;
-	viewport.Height = 600;
+	viewport.Width = SCREEN_WIDTH;
+	viewport.Height = SCREEN_HEIGHT;
 
 	g_pDevcon->RSSetViewports(1, &viewport);
 }
@@ -230,6 +234,8 @@ void RenderFrame()
 // this is the function that cleans up Direct3D and COM
 void CleanD3D()
 {
+	g_pSwapchain->SetFullscreenState(FALSE, NULL);	// switch to windowed mode
+
     // close and release all existing COM objects
 	g_pSwapchain->Release();
 	g_pRTView->Release();
