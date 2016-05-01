@@ -1,9 +1,13 @@
 #include <iostream>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include "res_path.h"
 #include "cleanup.h"
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
+//We'll just be using square tiles for now
+const int TILE_SIZE = 40;
 
 /**
 * Log an SDL error with some error message to the output stream of our choice
@@ -22,22 +26,32 @@ void logSDLError(std::ostream &os, const std::string &msg){
 */
 SDL_Texture* loadTexture(const std::string &file, SDL_Renderer *ren){
 	//Initialize to nullptr to avoid dangling pointer issues
-	SDL_Texture *texture = nullptr;
-	//Load the image
-	SDL_Surface *loadedImage = SDL_LoadBMP(file.c_str());
-	//If the loading went ok, convert to texture and return the texture
-	if (loadedImage != nullptr){
-		texture = SDL_CreateTextureFromSurface(ren, loadedImage);
-		SDL_FreeSurface(loadedImage);
-		//Make sure converting went ok too
-		if (texture == nullptr){
-			logSDLError(std::cout, "CreateTextureFromSurface");
-		}
+	SDL_Texture *texture = IMG_LoadTexture(ren, file.c_str());
+	if (texture == nullptr){
+		logSDLError(std::cout, "LoadTexture");
 	}
-	else {
-		logSDLError(std::cout, "LoadBMP");
-	}
+
 	return texture;
+}
+
+/**
+* Draw an SDL_Texture to an SDL_Renderer at position x, y, with some desired
+* width and height
+* @param tex The source texture we want to draw
+* @param ren The renderer we want to draw to
+* @param x The x coordinate to draw to
+* @param y The y coordinate to draw to
+* @param w The width of the texture to draw
+* @param h The height of the texture to draw
+*/
+void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y, int w, int h){
+	//Setup the destination rectangle to be at the position we want
+	SDL_Rect dst;
+	dst.x = x;
+	dst.y = y;
+	dst.w = w;
+	dst.h = h;
+	SDL_RenderCopy(ren, tex, NULL, &dst);
 }
 
 /**
@@ -49,18 +63,20 @@ SDL_Texture* loadTexture(const std::string &file, SDL_Renderer *ren){
 * @param y The y coordinate to draw to
 */
 void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y){
-	//Setup the destination rectangle to be at the position we want
-	SDL_Rect dst;
-	dst.x = x;
-	dst.y = y;
-	//Query the texture to get its width and height to use
-	SDL_QueryTexture(tex, NULL, NULL, &dst.w, &dst.h);
-	SDL_RenderCopy(ren, tex, NULL, &dst);
+	int w, h;
+	SDL_QueryTexture(tex, NULL, NULL, &w, &h);
+	renderTexture(tex, ren, x, y, w, h);
 }
 
 int main(int argc, char* argv[]) {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0){
 		logSDLError(std::cout, "SDL_Init");
+		return 1;
+	}
+
+	if ((IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG) != IMG_INIT_PNG){
+		logSDLError(std::cout, "IMG_Init");
+		SDL_Quit();
 		return 1;
 	}
 
@@ -79,23 +95,29 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	const std::string resPath = getResourcePath("Lession2");
-	SDL_Texture *background = loadTexture(resPath + "background.bmp", renderer);
-	SDL_Texture *image = loadTexture(resPath + "image.bmp", renderer);
+	const std::string resPath = getResourcePath("Lession3");
+	SDL_Texture *background = loadTexture(resPath + "background.png", renderer);
+	SDL_Texture *image = loadTexture(resPath + "image.png", renderer);
 	if (background == nullptr || image == nullptr){
 		cleanup(background, image, renderer, window);
+		IMG_Quit();
 		SDL_Quit();
 		return 1;
 	}
 
 	SDL_RenderClear(renderer);
 	
-	int bW, bH;
-	SDL_QueryTexture(background, NULL, NULL, &bW, &bH);
-	renderTexture(background, renderer, 0, 0);
-	renderTexture(background, renderer, bW, 0);
-	renderTexture(background, renderer, 0, bH);
-	renderTexture(background, renderer, bW, bH);
+	//Determine how many tiles we'll need to fill the screen
+	int xTiles = SCREEN_WIDTH / TILE_SIZE;
+	int yTiles = SCREEN_HEIGHT / TILE_SIZE;
+	
+	//Draw the tiles by calculating their positions
+	for (int i = 0; i < xTiles * yTiles; ++i){
+		int x = i % xTiles;
+		int y = i / xTiles;
+		renderTexture(background, renderer, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE,
+			TILE_SIZE);
+	}
 	
 	int iW, iH;
 	SDL_QueryTexture(image, NULL, NULL, &iW, &iH);
@@ -104,9 +126,10 @@ int main(int argc, char* argv[]) {
 	renderTexture(image, renderer, x, y);
 	
 	SDL_RenderPresent(renderer);
-	SDL_Delay(1000);
+	SDL_Delay(2000);
 	
 	cleanup(background, image, renderer, window);
+	IMG_Quit();
 	SDL_Quit();
 	
 	return 0;
