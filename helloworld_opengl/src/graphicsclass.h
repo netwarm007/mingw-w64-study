@@ -9,6 +9,9 @@
 // MY CLASS INCLUDES //
 ///////////////////////
 #include "openglclass.h"
+#include "cameraclass.h"
+#include "modelclass.h"
+#include "colorshaderclass.h"
 
 
 /////////////
@@ -39,6 +42,9 @@ private:
 
 private:
 	OpenGLClass* m_OpenGL;
+	CameraClass* m_Camera;
+	ModelClass* m_Model;
+	ColorShaderClass* m_ColorShader;
 };
 
 #endif

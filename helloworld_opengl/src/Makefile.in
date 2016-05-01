@@ -101,7 +101,8 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_helloworld_opengl_OBJECTS = graphicsclass.$(OBJEXT) \
 	inputclass.$(OBJEXT) main.$(OBJEXT) openglclass.$(OBJEXT) \
-	systemclass.$(OBJEXT)
+	systemclass.$(OBJEXT) colorshaderclass.$(OBJEXT) \
+	modelclass.$(OBJEXT) cameraclass.$(OBJEXT)
 helloworld_opengl_OBJECTS = $(am_helloworld_opengl_OBJECTS)
 helloworld_opengl_DEPENDENCIES =
 AM_V_P = $(am__v_P_@AM_V@)
@@ -252,7 +253,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-helloworld_opengl_SOURCES = graphicsclass.cpp inputclass.cpp main.cpp openglclass.cpp systemclass.cpp
+helloworld_opengl_SOURCES = graphicsclass.cpp inputclass.cpp main.cpp openglclass.cpp systemclass.cpp colorshaderclass.cpp modelclass.cpp cameraclass.cpp
 helloworld_opengl_LDADD = -lopengl32 -lgdi32
 all: all-am
 
@@ -340,9 +341,12 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cameraclass.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/colorshaderclass.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/graphicsclass.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inputclass.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modelclass.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/openglclass.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/systemclass.Po@am__quote@
 
