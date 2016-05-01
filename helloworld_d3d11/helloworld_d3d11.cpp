@@ -291,6 +291,9 @@ void InitPipeline() {
 
     g_pDev->CreateInputLayout(ied, 2, VS->GetBufferPointer(), VS->GetBufferSize(), &g_pLayout);
     g_pDevcon->IASetInputLayout(g_pLayout);
+
+	VS->Release();
+	PS->Release();
 }
 
 // this is the function that creates the shape to render
