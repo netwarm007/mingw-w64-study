@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	const std::string resPath = getResourcePath("Lession3");
+	const std::string resPath = getResourcePath("Lession4");
 	SDL_Texture *background = loadTexture(resPath + "background.png", renderer);
 	SDL_Texture *image = loadTexture(resPath + "image.png", renderer);
 	if (background == nullptr || image == nullptr){
@@ -123,11 +123,28 @@ int main(int argc, char* argv[]) {
 	SDL_QueryTexture(image, NULL, NULL, &iW, &iH);
 	int x = SCREEN_WIDTH / 2 - iW / 2;
 	int y = SCREEN_HEIGHT / 2 - iH / 2;
-	renderTexture(image, renderer, x, y);
 	
-	SDL_RenderPresent(renderer);
-	SDL_Delay(2000);
-	
+	//Our event structure
+	SDL_Event e;
+	bool quit = false;
+	while (!quit){
+		while (SDL_PollEvent(&e)){
+			if (e.type == SDL_QUIT){
+				quit = true;
+			}
+			if (e.type == SDL_KEYDOWN){
+				quit = true;
+			}
+			if (e.type == SDL_MOUSEBUTTONDOWN){
+				quit = true;
+			}
+		}
+		//Render the scene
+		SDL_RenderClear(renderer);
+		renderTexture(image, renderer, x, y);
+		SDL_RenderPresent(renderer);
+	}
+
 	cleanup(background, image, renderer, window);
 	IMG_Quit();
 	SDL_Quit();
