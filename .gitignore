@@ -5,4 +5,3 @@ autom4te.cache/
 *.log
 *~
 .deps
-*.in
