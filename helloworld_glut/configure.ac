@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([helloworld_glut], [1.0], [chenwenli@chenwenli.com])
-AC_CONFIG_SRCDIR([hello.c])
+AC_CONFIG_SRCDIR([helloworld_glut.c])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
 
