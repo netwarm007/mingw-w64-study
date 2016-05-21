@@ -25,7 +25,7 @@ bool ColorShaderClass::Initialize(OpenGLClass* OpenGL, HWND hwnd)
 
 
 	// Initialize the vertex and pixel shaders.
-	result = InitializeShader("../Engine/color.vs", "../Engine/color.ps", OpenGL, hwnd);
+	result = InitializeShader("../shader/color.vs", "../shader/color.ps", OpenGL, hwnd);
 	if(!result)
 	{
 		return false;

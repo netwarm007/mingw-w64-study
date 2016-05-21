@@ -6,3 +6,5 @@ autom4te.cache/
 *~
 .deps
 build/
+Makefile
+Makefile.in
